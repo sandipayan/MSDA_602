@@ -1,0 +1,65 @@
+
+f=open("/users/sandipayannandi/Documents/IS-602/Week3/cars.data.csv", "rU")
+
+lines = f.readlines()
+f.close()
+
+buying_price=[]
+maint_price=[]
+doors=[]
+persons=[]
+lug_boot=[]
+safety=[]
+
+n_buying_price=[]
+n_safety=[]
+n_maint=[]
+
+
+def map(input):
+    if (input=='vhigh' or input=='v-high' ):
+        return 1
+    elif (input=='high' or input=='big'):
+        return 2
+    elif (input=='med'):
+        return 3
+    elif (input=='low' or input=='small'):
+        return 4
+    else:
+        return 5
+
+
+for i in range(0,len(lines)-1):
+   buying_price.append( (lines[i].split(","))[0])
+   maint_price.append( lines[i].split(",") [1] )
+   doors.append( lines[i].split(",") [2] )
+   persons.append( lines[i].split(",") [3] )
+   lug_boot.append( lines[i].split(",") [4] )
+   safety.append( lines[i].split(",") [5] )
+
+   n_buying_price.append( map ( (lines[i].split(","))[0]) )
+   n_safety.append( map ( (lines[i].split(","))[5]) )
+   n_maint.append( map ( (lines[i].split(","))[1]) )
+
+# print the top 10 rows of the data sorted by 'safety' in descending order
+sorted_safety = sorted(range(len(n_safety)), key=lambda k: n_safety[k])
+
+for i in range(0,10):
+    print (lines[sorted_safety[i]])
+
+
+print("******************************************")
+# print the bottom 15 rows of the data sorted by 'maint' in ascending order, i.e first 15 rows in descending order
+sorted_maint = sorted(range(len(n_maint)), key=lambda k: n_maint[k])
+
+for i in range(0,15):
+    print (lines[sorted_maint[i]])
+
+print("******************************************")
+# Print all rows that are high or vhigh in fields 'buying', 'maint', and 'safety', sorted by 'doors' in ascending order
+
+for 
+
+
+
+
