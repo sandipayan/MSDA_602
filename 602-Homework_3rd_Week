@@ -1,4 +1,5 @@
 
+import re
 f=open("/users/sandipayannandi/Documents/IS-602/Week3/cars.data.csv", "rU")
 
 lines = f.readlines()
@@ -29,7 +30,7 @@ def map(input):
         return 5
 
 
-for i in range(0,len(lines)-1):
+for i in range(0,len(lines)):
    buying_price.append( (lines[i].split(","))[0])
    maint_price.append( lines[i].split(",") [1] )
    doors.append( lines[i].split(",") [2] )
@@ -41,24 +42,56 @@ for i in range(0,len(lines)-1):
    n_safety.append( map ( (lines[i].split(","))[5]) )
    n_maint.append( map ( (lines[i].split(","))[1]) )
 
+
+
+
 # print the top 10 rows of the data sorted by 'safety' in descending order
 sorted_safety = sorted(range(len(n_safety)), key=lambda k: n_safety[k])
 
-for i in range(0,10):
-    print (lines[sorted_safety[i]])
+# for i in range(0,10):
+#     print (lines[sorted_safety[i]])
 
 
 print("******************************************")
 # print the bottom 15 rows of the data sorted by 'maint' in ascending order, i.e first 15 rows in descending order
 sorted_maint = sorted(range(len(n_maint)), key=lambda k: n_maint[k])
 
-for i in range(0,15):
-    print (lines[sorted_maint[i]])
+# for i in range(0,15):
+#     print (lines[sorted_maint[i]])
 
 print("******************************************")
 # Print all rows that are high or vhigh in fields 'buying', 'maint', and 'safety', sorted by 'doors' in ascending order
 
-for 
+pattern=re.compile('high|vhigh')
+
+f_buy = [i for i in range(0,len(buying_price)) if buying_price[i]=='vhigh' or buying_price[i] =='high']
+
+f_maint  = [x for i, x in enumerate(f_buy)   if re.match(pattern, maint_price[x])]
+f_safety  = [x for i, x in enumerate(f_maint)   if re.match(pattern, safety[x])]
+
+
+f_door={}
+
+for i,x in enumerate(f_safety):
+    f_door[x]=doors[x]
+
+
+sorted_door= sorted(f_door.items(), key=lambda x: x[1])
+
+print(len(sorted_door))
+
+for items in enumerate(sorted_door):
+     print (items[0] , items[1])
+
+##use dictionary to sort
+
+# f_door_sorted=sorted(range(len(f_door)), key=lambda k: f_door[k])
+#
+# print(f_door_sorted)
+#
+# for i,x in enumerate(f_door_sorted):
+#     print (lines[x])
+
 
 
 
