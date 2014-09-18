@@ -1,7 +1,7 @@
 
 import re
-f=open("/users/sandipayannandi/Documents/IS-602/Week3/cars.data.csv", "rU")
 
+f=open("/users/sandipayannandi/Documents/IS-602/Week3/cars.data.csv", "rU")
 lines = f.readlines()
 f.close()
 
@@ -11,7 +11,6 @@ doors=[]
 persons=[]
 lug_boot=[]
 safety=[]
-
 n_buying_price=[]
 n_safety=[]
 n_maint=[]
@@ -43,21 +42,34 @@ for i in range(0,len(lines)):
    n_maint.append( map ( (lines[i].split(","))[1]) )
 
 
+if(set(buying_price) != set(['high', 'med',  'low', 'vhigh'])):
+    raise ValueError('Wrong entry in buying price')
+if(set(maint_price) != set(['high', 'med', 'vhigh', 'low'])):
+    raise ValueError('Wrong entry in maint price')
+if(set(doors) != set(['5more', '3', '2', '4'])):
+    raise ValueError('Wrong entry in doors')
+if(set(persons) != set(['2', '4', 'more'])):
+    raise ValueError('Wrong entry in persons')
+if(set(lug_boot) != set(['small', 'med', 'big'])):
+    raise ValueError('Wrong entry in lug boot')
+if(set(safety) != set(['high', 'med', 'low'])):
+    raise ValueError('Wrong entry in safety')
+
 
 
 # print the top 10 rows of the data sorted by 'safety' in descending order
 sorted_safety = sorted(range(len(n_safety)), key=lambda k: n_safety[k])
 
-# for i in range(0,10):
-#     print (lines[sorted_safety[i]])
+for i in range(0,10):
+    print (lines[sorted_safety[i]])
 
 
 print("******************************************")
 # print the bottom 15 rows of the data sorted by 'maint' in ascending order, i.e first 15 rows in descending order
 sorted_maint = sorted(range(len(n_maint)), key=lambda k: n_maint[k])
 
-# for i in range(0,15):
-#     print (lines[sorted_maint[i]])
+for i in range(0,15):
+    print (lines[sorted_maint[i]])
 
 print("******************************************")
 # Print all rows that are high or vhigh in fields 'buying', 'maint', and 'safety', sorted by 'doors' in ascending order
@@ -65,7 +77,6 @@ print("******************************************")
 pattern=re.compile('high|vhigh')
 
 f_buy = [i for i in range(0,len(buying_price)) if buying_price[i]=='vhigh' or buying_price[i] =='high']
-
 f_maint  = [x for i, x in enumerate(f_buy)   if re.match(pattern, maint_price[x])]
 f_safety  = [x for i, x in enumerate(f_maint)   if re.match(pattern, safety[x])]
 
@@ -75,24 +86,25 @@ f_door={}
 for i,x in enumerate(f_safety):
     f_door[x]=doors[x]
 
+for key, value in sorted(f_door.iteritems(), key=lambda (k,v): (v,k)):
+    print(lines[key])
 
-sorted_door= sorted(f_door.items(), key=lambda x: x[1])
-
-print(len(sorted_door))
-
-for items in enumerate(sorted_door):
-     print (items[0] , items[1])
-
-##use dictionary to sort
-
-# f_door_sorted=sorted(range(len(f_door)), key=lambda k: f_door[k])
-#
-# print(f_door_sorted)
-#
-# for i,x in enumerate(f_door_sorted):
-#     print (lines[x])
+# save to a file all rows (in any order) that are: 'buying': vhigh, 'maint': med, 'doors': 4, and 'persons': 4 or more.
+print("******************************************")
 
 
+pattern=re.compile('4|more')
 
+f_buy_w = [i for i in range(0,len(buying_price)) if buying_price[i] =='high']
+f_maint_w  = [x for i, x in enumerate(f_buy_w)   if re.match('med', maint_price[x])]
+f_doors_w  = [x for i, x in enumerate(f_maint_w)   if re.match('4', doors[x])]
+f_persons_w  = [x for i, x in enumerate(f_doors_w)   if re.match(pattern, persons[x])]
+
+f=open("/users/sandipayannandi/Documents/IS-602/Week3/output.txt", "w")
+
+for i,x in enumerate(f_persons_w):
+    f.write(lines[x])
+
+f.close()
 
 
