@@ -1,0 +1,136 @@
+import numpy
+import time
+
+
+#1. fill in this function
+#   it takes a list for input and return a sorted version
+#   do this with a loop, don't use the built in list functions
+
+def sortwithloops(input):
+
+    sortwl_tm = time.time()
+
+    input_list=list(input)
+    op_list=list([input_list[0]])
+    input_list.remove(input_list[0])
+    while len(input_list)>0:
+        i=-1
+        inserted=False
+        for elements in op_list:
+            i=i+1
+            # had to use this as op_list.index(elements) does not work properly when there are duplicate elements
+            if len(op_list)>1 and i < len(op_list)-1 and inserted==False:
+                if op_list[i] <= input_list[0] <= op_list[i+1]:
+                    op_list.insert(i+1,input_list[0])
+                    input_list.remove(input_list[0])
+                    inserted=True
+
+
+        if inserted == False:
+            if input_list[0] <= op_list[0]:
+                op_list.insert(0,input_list[0])
+            else:
+                op_list.append(input_list[0])
+            input_list.remove(input_list[0])
+
+    #return op_list
+    return  'Sort using iteration           :' , len(input) , 'Loops =', '{0:.10f}'.format(time.time() - sortwl_tm), ' seconds'
+
+
+
+#2. fill in this function
+#   it takes a list for input and return a sorted version
+#   do this with the built in list functions, don't us a loop
+def sortwithoutloops(input):
+
+    sortwol_tm = time.time()
+    input.sort()
+    #return input
+
+    #return sorted(input)
+    return  'Sort using built in python     :' , len(input) , 'Loops =', '{0:.10f}'.format(time.time() - sortwol_tm), ' seconds'
+
+
+def sortwithnumpy(input, kind):
+    sortwnp_tm = time.time()
+    numpy.sort(input,kind=kind)
+    return  kind,'Sort using numpy  :' , len(input) , 'Loops =', '{0:.10f}'.format(time.time() - sortwnp_tm), ' seconds'
+
+
+
+
+
+#3. fill in this function
+#   it takes a list for input and a value to search for
+#	it returns true if the value is in the list, otherwise false
+#   do this with a loop, don't use the built in list functions
+def searchwithloops(input, value):
+    srchwl_tm = time.time()
+    found=False
+    for element in input:
+        if element==value:
+            found=True
+    #return found
+    return  'Search using iteration         :', len(input) , 'Loops =', '{0:.10f}'.format(time.time() - srchwl_tm), ' seconds'
+
+
+
+
+
+
+
+
+#4. fill in this function
+#   it takes a list for input and a value to search for
+#	it returns true if the value is in the list, otherwise false
+#   do this with the built in list functions, don't use a loop
+def searchwithoutloops(input, value):
+    srchwol_tm = time.time()
+    x= value in input
+    return  'Search using built in python   :',len(input) , 'Loops =', '{0:.10f}'.format(time.time() - srchwol_tm), ' seconds'
+
+
+def searchwithnumpy(input,srch):
+    srchwnp_tm = time.time()
+    x= numpy.searchsorted(input,srch)
+    return  'Search using numpy             :' ,len(input) , 'Loops =',  '{0:.10f}'.format(time.time() - srchwnp_tm), ' seconds'
+
+
+
+
+
+if __name__ == "__main__":
+    L = numpy.arange(10000)
+
+
+    print sortwithloops(L) # [3, 3, 5, 5, 6, 6, 13]
+    print sortwithoutloops(L) # [3, 3, 5, 5, 6, 6, 13]
+    print sortwithnumpy(L,'quicksort')
+    print sortwithnumpy(L,'mergesort')
+    print sortwithnumpy(L,'heapsort')
+    print('----------------------------------------')
+    print searchwithloops(L, 43)
+    print searchwithoutloops(L, 5)
+    print searchwithnumpy(L,3)
+
+
+
+
+
+
+# /Library/Frameworks/Python.framework/Versions/2.7/bin/python2.7 /Users/sandipayannandi/Documents/IS-602/IS-602/Week6_Numpy
+# ('Sort using iteration           :', 10000, 'Loops =', '18.7077028751', ' seconds')
+# ('Sort using built in python     :', 10000, 'Loops =', '0.0000720024', ' seconds')
+# ('quicksort', 'Sort using numpy  :', 10000, 'Loops =', '0.0000760555', ' seconds')
+# ('mergesort', 'Sort using numpy  :', 10000, 'Loops =', '0.0001049042', ' seconds')
+# ('heapsort', 'Sort using numpy   :', 10000, 'Loops =', '0.0004589558', ' seconds')
+# ----------------------------------------
+# ('Search using iteration         :', 10000, 'Loops =', '0.0013811588', ' seconds')
+# ('Search using built in python   :', 10000, 'Loops =', '0.0000319481', ' seconds')
+# ('Search using numpy             :', 10000, 'Loops =', '0.0000109673', ' seconds')
+#
+# Process finished with exit code 0
+
+
+
+
