@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import re
+
+headers= ['host', 'datetime' ,'request', 'replycode', 'bytes']
+
+quote_conv=lambda x: str(x.replace('"', ''))
+bytes_conv=lambda x: int(x.replace('-','0' ))
+
+
+epa_file= pd.read_csv('/Users/sandipayannandi/Documents/IS-602/Data/epa-http.txt',names=headers ,
+                      converters={'request': quote_conv , 'bytes':bytes_conv } ,sep=' ' ,quotechar='"' )
+
+
+
+# 1.  Which hostname or IP address made the most requests?
+
+
+byhost=epa_file.groupby('host')
+
+print('# 1.  Which hostname or IP address made the most requests?')
+print byhost.request.count().order(ascending=False)[:1]
+
+
+#2.Which hostname or IP address received the most total bytes from the server?  How many bytes did it receive?
+
+print('#2.Which hostname or IP address received the most total bytes from the server?  How many bytes did it receive?')
+print byhost.bytes.sum().order(ascending=False)[:1]
+
+
+
+#3.During what hour was the server the busiest in terms of requests?
+
+print('#3.During what hour was the server the busiest in terms of requests?')
+
+hour_split= pd.DataFrame(epa_file.datetime.apply(lambda s: pd.Series({'hour':s.split(":" ,3)[1]})) )
+print(hour_split.groupby('hour').hour.count().order(ascending=False)[:1])
+
+
+#4.Which .gif image was downloaded the most during the day?
+
+print('#4.Which .gif image was downloaded the most during the day?')
+
+df=pd.DataFrame(epa_file[epa_file['request'].str.contains('.gif')])
+df= pd.DataFrame(   df.request.apply(lambda s: pd.Series({'request': re.findall(r'\w(?:[-\w]*\w)?.gif ' , s)   }))  )
+df= pd.DataFrame(   df.request.apply(lambda s: pd.Series({'request': str(s).strip('[]')    }))  )
+
+print(df.groupby('request').request.count().order(ascending=False)[:1])
+
+
+#5. What HTTP reply codes were sent other than 200?
+
+print('#5. What HTTP reply codes were sent other than 200?')
+
+print(epa_file['replycode'].unique())
+
+
+# Answers:
+# ===========
+#
+# # 1.  Which hostname or IP address made the most requests?
+#
+# sandy.rtptok1.epa.gov    294
+#
+#
+# #2.Which hostname or IP address received the most total bytes from the server?  How many bytes did it receive?
+#
+# piankhi.cs.hamptonu.edu    7267751
+#
+# #3.During what hour was the server the busiest in terms of requests?
+# hour
+# 14      4716
+#
+# #4.Which .gif image was downloaded the most during the day?
+#
+# request
+# 'circle_logo_small.gif '    3237
+#
+# #5. What HTTP reply codes were sent other than 200?
+#
+# [200 302 304 404 403 501 500 400]
+
