@@ -1,0 +1,75 @@
+# ipcluster start --n=4
+
+## first block
+
+from IPython import parallel
+clients = parallel.Client() 
+clients.block=True
+dview=clients.direct_view()
+
+
+## second block
+
+%%px
+def mc_loop(iter):
+    for i in iter:
+        last_price_mc=last_price
+        for i in range(20):
+            x=random.gauss(pct_change_mean,pct_change_std)
+            last_price_mc=last_price_mc*(1+ x )
+        mc_price_list.append(last_price_mc)
+    return mc_price_list  
+    
+    
+## Third block
+
+import csv
+import numpy as np
+%px import random
+%px import numpy as np
+import time 
+
+t0 = time.clock()
+
+
+file="/Users/sandipayannandi/Documents/IS-602/Data/apple.2011.csv"
+mc_price_list=[]
+pct_change=[]
+
+with open (file,"rb") as csvfile:
+    csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    next(csvreader)
+    for row in csvreader:
+        pct_change.append(float(row[2]))
+        last_price=float(row[1])
+
+
+pct_change_mean= np.mean(pct_change)
+pct_change_std = np.std(pct_change)
+
+%px last_price=$last_price
+%px pct_change_mean=$pct_change_mean
+%px pct_change_std=$pct_change_std
+%px mc_price_list=$mc_price_list
+
+
+dview.scatter('x', range(500000) )
+dview.execute('y = mc_loop(x)')
+y = dview.gather('y')
+
+mc_one_pct= int(np.ceil(len(y)*0.01))
+
+mc_prediction=(sorted(y)[mc_one_pct-1])
+
+print ("Stock price will be above %f dollars after 20 days with a confidence level of 99 percentage."  %(mc_prediction) )
+
+print 'Time Elapsed = ' , time.clock() - t0 , ' seconds'   
+
+
+
+
+   	
+    	
+    	
+    	
+    	

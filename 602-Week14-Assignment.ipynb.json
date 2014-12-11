@@ -1,0 +1,146 @@
+{
+ "metadata": {
+  "name": "",
+  "signature": "sha256:287c2ed9dc1be9787fe01785ad634d42965ef752e0fafe89d1e0af383e536c96"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "from IPython import parallel"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 1
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "clients = parallel.Client()"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 2
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "clients.block=True"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 3
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "dview=clients.direct_view()"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 4
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "%%px\n",
+      "def mc_loop(iter):\n",
+      "    for i in iter:\n",
+      "        last_price_mc=last_price\n",
+      "        for i in range(20):\n",
+      "            x=random.gauss(pct_change_mean,pct_change_std)\n",
+      "            last_price_mc=last_price_mc*(1+ x )\n",
+      "        mc_price_list.append(last_price_mc)\n",
+      "    return mc_price_list "
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [],
+     "prompt_number": 5
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [
+      "import csv\n",
+      "import numpy as np\n",
+      "%px import random\n",
+      "%px import numpy as np\n",
+      "import time \n",
+      "\n",
+      "t0 = time.clock()\n",
+      "\n",
+      "\n",
+      "file=\"/Users/sandipayannandi/Documents/IS-602/Data/apple.2011.csv\"\n",
+      "mc_price_list=[]\n",
+      "pct_change=[]\n",
+      "\n",
+      "with open (file,\"rb\") as csvfile:\n",
+      "    csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')\n",
+      "    next(csvreader)\n",
+      "    for row in csvreader:\n",
+      "        pct_change.append(float(row[2]))\n",
+      "        last_price=float(row[1])\n",
+      "\n",
+      "\n",
+      "pct_change_mean= np.mean(pct_change)\n",
+      "pct_change_std = np.std(pct_change)\n",
+      "\n",
+      "%px last_price=$last_price\n",
+      "%px pct_change_mean=$pct_change_mean\n",
+      "%px pct_change_std=$pct_change_std\n",
+      "%px mc_price_list=$mc_price_list\n",
+      "\n",
+      "\n",
+      "dview.scatter('x', range(500000) )\n",
+      "dview.execute('y = mc_loop(x)')\n",
+      "y = dview.gather('y')\n",
+      "\n",
+      "mc_one_pct= int(np.ceil(len(y)*0.01))\n",
+      "\n",
+      "mc_prediction=(sorted(y)[mc_one_pct-1])\n",
+      "\n",
+      "print (\"Stock price will be above %f dollars after 20 days with a confidence level of 99 percentage.\"  %(mc_prediction) )\n",
+      "\n",
+      "print 'Time Elapsed = ' , time.clock() - t0 , ' seconds'   \n"
+     ],
+     "language": "python",
+     "metadata": {},
+     "outputs": [
+      {
+       "output_type": "stream",
+       "stream": "stdout",
+       "text": [
+        "Stock price will be above 346.786685 dollars after 20 days with a confidence level of 99 percentage.\n",
+        "Time Elapsed =  0.832607  seconds\n"
+       ]
+      }
+     ],
+     "prompt_number": 6
+    },
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [],
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}
