@@ -1,0 +1,74 @@
+#######################
+
+# 2011: Household and population data extracted from :
+# http://www.censusindia.gov.in/2011census/hh-series/hh01.html
+# 2001:
+#http://www.censusindia.gov.in/(S(5ccvsj45jl3zxj555acdx345))/DigitalLibrary/MFTableSeries.aspx
+
+########################
+
+
+# 1. Which state has most number of single households
+
+x= df[[  'State_Name', 'No_Of_HH']]   [ ( df['People_Cons_HH']== 1) &  ( df['Seniors_In_HH']== "1")  & ( df['Region']== "TOTAL")  ]
+print(x.sort(['No_Of_HH'], ascending=[0]))
+
+
+
+#2. Which state has most number of senior citizens
+
+x= df[[  'State_Name', 'Senior_Male' , 'Senior_Female']]   [ ( df['Seniors_In_HH']== "Total")  & ( df['Region']== "TOTAL")  ]
+x=x.groupby('State_Name', as_index=False).sum()
+x['sum_old']= x['Senior_Male'] + x['Senior_Female']
+print(x[[ 'State_Name','sum_old'  ]].sort( ['sum_old'], ascending=[0] ) )
+
+#3. Create a bar plot showing the seniors living alone for each state
+
+
+df= df[[  'State_Name', 'No_Of_HH']]   [ ( df['People_Cons_HH']== 1) &  ( df['Seniors_In_HH']== "1")  & ( df['Region']== "TOTAL")  ]
+
+df=df.sort(['No_Of_HH'], ascending=0)
+
+
+x=np.arange(len(df['No_Of_HH']))
+y=df['No_Of_HH']
+
+f = plt.figure('Number of seniors' )
+ax = f.add_axes([0.1, 0.1, 0.8, 0.8])
+
+ax.bar(x, y, align='center')
+
+plt.xlabel('States')
+plt.ylabel('Seniors')
+ax.set_xticks(x)
+tkname=df['State_Name'].tolist()
+ax.set_xticklabels(tkname,rotation=40,ha='right')
+plt.show()
+
+
+
+
+#4. A stacked bar plot of senior male/female living alone
+
+
+
+df= df[[  'State_Name', 'Senior_Male', 'Senior_Female']]   [ ( df['People_Cons_HH']== 1) &  ( df['Seniors_In_HH']== "1")  & ( df['Region']== "TOTAL")  ]
+df=df.groupby('State_Name', as_index=False).sum()
+df['sum_old']= df['Senior_Male'] + df['Senior_Female']
+df=df[[ 'State_Name', 'Senior_Male', 'Senior_Female', 'sum_old' ]].sort( ['sum_old'], ascending=[0] )
+
+x=np.arange(len(df['State_Name']))
+Male=df['Senior_Male']
+Female=df['Senior_Female']
+
+p1=plt.bar(x,Male,color='r',bottom=Female)
+p2=plt.bar(x,Female,color='y')
+tkname=df['State_Name'].tolist()
+plt.xticks(x, tkname,rotation=45,ha='right' )
+plt.legend( (p1[0], p2[0]), ('Male', 'Female') )
+plt.show()
+
+
+
+
+
