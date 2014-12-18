@@ -22,6 +22,8 @@ x=x.groupby('State_Name', as_index=False).sum()
 x['sum_old']= x['Senior_Male'] + x['Senior_Female']
 print(x[[ 'State_Name','sum_old'  ]].sort( ['sum_old'], ascending=[0] ) )
 
+
+
 #3. Create a bar plot showing the seniors living alone for each state
 
 
@@ -67,6 +69,17 @@ tkname=df['State_Name'].tolist()
 plt.xticks(x, tkname,rotation=45,ha='right' )
 plt.legend( (p1[0], p2[0]), ('Male', 'Female') )
 plt.show()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
