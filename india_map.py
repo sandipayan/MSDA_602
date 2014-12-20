@@ -9,10 +9,12 @@ import re
 import random
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
-
+import matplotlib.cm as cm
 import shapefile
 from pysal.esda.mapclassify import Natural_Breaks as nb
 from matplotlib.colors import Normalize
+from bokeh.plotting import *
+
 
 df_map=pd.read_csv('/Users/sandipayannandi/Documents/IS-602/602-Final-Project/Single_Living_Alone.csv', sep=',' ,quotechar='"' )
 
@@ -77,10 +79,6 @@ def getDict ( state_name, shapefile ):
         for i in getParts(j):
             points.append(i)
 
-    # Prepare the dictionary
-    # Seperate the points into two separate lists of lists (easier for bokeh to consume)
-    #      - one representing latitudes
-    #      - second representing longitudes
 
     lat = []
     lng = []
@@ -107,21 +105,34 @@ states = set([i[2] for i in dat.iterRecords()])
 
 # Create the Plot, using bokeh, which is kind of new
 
-from bokeh.plotting import *
 
 # use output_file while in PyCharm, use output_notebook() in the Ipython notebook
 
-#output_file("india_states.html")
+output_file("india_states.html")
 
-output_notebook()
+#output_notebook()
 
 hold()
 
 TOOLS="pan,wheel_zoom,box_zoom,reset,previewsave"
-figure(title="Map of India", tools=TOOLS, plot_width=800, plot_height=650)
+p=figure(title="Percentage of Seniors Living Alone", tools=TOOLS, plot_width=800, plot_height=650)
 
 
-#print(df_map[['State_Name', 'pct_old_living_alone' , 'jenks_bins']])
+bins=sorted(list(df_map['jenks_bins'].unique()))
+
+x0 = [1, 2, 3, 4, 5]
+
+for i in bins:
+    pct_min=df_map['pct_old_living_alone'][ df_map['jenks_bins']==i ].min()
+    pct_max=df_map['pct_old_living_alone'][ df_map['jenks_bins']==i ].max()
+    map_col=df_map['Palette'][ df_map['jenks_bins']==i ].unique()
+    map_col=str(map_col).strip('[').strip(']').strip("'")
+    p.circle(x0, x0, legend=str(pct_min) + "-" + str(pct_max)+"%" ,fill_color= "%s"%map_col )
+
+
+print(df_map)
+
+
 
 for state_name in states:
     col= df_map['Palette'][( df_map['State_Name']== state_name.upper())].to_string()
@@ -135,7 +146,10 @@ for state_name in states:
         patches(data[state_name]['lat_list'], data[state_name]['lng_list'], \
                 fill_color= "%s"%col , line_color="black")
 
+
+
 show()
+
 
 
 
