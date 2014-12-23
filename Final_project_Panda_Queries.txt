@@ -77,3 +77,47 @@ plt.show()
 
 pylab.rcParams['figure.figsize'] = (10.0, 8.0)
 pylab.rcParams['font.size']= 12
+
+
+
+
+######### Wanted a   urban /rural combination , counld not work out
+
+df_var= df_senior[[  'State_Name','Region' ,'Senior_Male' , 'Senior_Female']]   [ ( df_senior['Seniors_In_HH']== "Total")  & ( (df_senior['Region'] =="RURAL") | (df_senior['Region'] == "URBAN") )  & ( df_senior['Census_Year']== 2011) ]
+df_var=df_var.groupby(['State_Name', 'Region' ], as_index=False).sum()
+df_var['Sum_Old']=df_var['Senior_Male'] + df_var['Senior_Female']
+df_var=df_var[['State_Name','Region','Sum_Old']]
+
+df_var=df_var.pivot(index='State_Name', columns='Region', values='Sum_Old')
+#df_var=df_var[(df_var['Region'] != 'INDIA' )]
+#print(df_var[['State_Name ']])
+
+print(list(df_var.columns.values) )
+
+print(df_var)
+
+
+#########
+
+
+######################################################
+# Prepare data for Seniors Living Alone
+######################################################
+
+
+df_single_old= df_senior[[  'State_Name', 'Senior_Male', 'Senior_Female']]   [ ( df_senior['People_Cons_HH']== 1) &  ( df_senior['Seniors_In_HH']== "1")  & ( df_senior['Region']== "TOTAL")  ]
+df_single_old=df_single_old.groupby('State_Name', as_index=False).sum()
+df_single_old['sum_single_old']= df_single_old['Senior_Male'] + df_single_old['Senior_Female']
+
+df_all_old= df_senior[[  'State_Name', 'Senior_Male', 'Senior_Female']]   [ (df_senior['Seniors_In_HH']=='Total')  & ( df_senior['Region']== "TOTAL")  ]
+df_all_old=df_all_old.groupby('State_Name', as_index=False).sum()
+df_all_old['sum_all_old']= df_all_old['Senior_Male'] + df_all_old['Senior_Female']
+
+
+
+df=pd.merge(df_single_old,df_all_old, on='State_Name')
+df['pct_old_living_alone']= df['sum_single_old'] / df['sum_all_old'] * 100
+df['pct_old_living_alone']=df['pct_old_living_alone'].map(lambda x:round(x,2))
+
+df.to_csv('/Users/sandipayannandi/Documents/IS-602/602-Final-Project/Single_Living_Alone.csv', sep=',' ,quotechar='"' )
+
